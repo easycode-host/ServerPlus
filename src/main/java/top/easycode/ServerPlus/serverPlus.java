@@ -1,6 +1,7 @@
 package top.easycode.ServerPlus;
 
-import it.unimi.dsi.fastutil.Hash;
+
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -10,7 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -18,13 +19,14 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+
 import java.util.UUID;
 
 public final class serverPlus extends JavaPlugin implements Listener {
-    public HashMap<UUID, Boolean> logged = new HashMap<UUID, Boolean>();
-    public HashMap<UUID, UUID> TpaPlayers = new HashMap<UUID, UUID>();
-    public HashMap<UUID, String> TpaState = new HashMap<UUID, String>();
+    public HashMap<UUID, Boolean> logged = new HashMap<>();
+    public HashMap<UUID, UUID> TpaPlayers = new HashMap<>();
+    public HashMap<UUID, String> TpaState = new HashMap<>();
     public String DataPath = "./plugins/ServerPlus/";
     @Override
     public void onEnable() {
@@ -187,15 +189,68 @@ public final class serverPlus extends JavaPlugin implements Listener {
             return true;
         }
         if (command.getName().equalsIgnoreCase("sethome")) {
-            if (args.length != 0) {
-                player.sendMessage("§c§l命令格式错误§r");
-                player.sendMessage("§2用法：/sethome§r");
-            }
             YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).set("home", player.getLocation());
             player.sendMessage("§2§l家已设置§r");
             return true;
         }
-
+        if (command.getName().equalsIgnoreCase("home")) {
+            if (YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).get("home") == null) return false;
+            player.teleport((Location) YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).get("home"));
+            player.sendMessage("§2§l传送至家成功§r");
+            return true;
+        }
+        if (command.getName().equalsIgnoreCase("delhome")) {
+            YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).set("home", null);
+            player.sendMessage("§2§l家已删除§r");
+        }
+        if (command.getName().equalsIgnoreCase("setwarp")) {
+            if (args.length == 0) {
+                player.sendMessage("§c§l命令格式错误§r");
+                player.sendMessage("§2用法：/setwarp <名称>§r");
+                return false;
+            }
+            List<String> warps = YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).getStringList("warps");
+            warps.add(args[0]);
+            YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).set("warps", warps);
+            player.sendMessage("§2§l传送点已设置§r");
+            return true;
+        }
+        if (command.getName().equalsIgnoreCase("warp")) {
+            if (args.length == 0) {
+                player.sendMessage("§c§l命令格式错误§r");
+                player.sendMessage("§2用法：/warp <名称>§r");
+            }
+            List<String> warps = YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).getStringList("warps");
+            if (!warps.contains(args[0])) {
+                player.sendMessage("§c§l传送点不存在§r");
+                return false;
+            }
+            player.teleport((Location) YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).get("warps."+args[0]));
+        }
+        if (command.getName().equalsIgnoreCase("delwarp")) {
+            if (args.length == 0) {
+                player.sendMessage("§c§l命令格式错误§r");
+                player.sendMessage("§2用法：/delwarp <名称>§r");
+                return false;
+            }
+            List<String> warps = YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).getStringList("warps");
+            if (!warps.contains(args[0])) {
+                player.sendMessage("§c§l传送点不存在§r");
+                return false;
+            }
+            warps.remove(args[0]);
+            YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).set("warps", warps);
+            player.sendMessage("§2§l传送点已删除§r");
+            return true;
+        }
+        if (command.getName().equalsIgnoreCase("warplist")) {
+            List<String> warps = YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).getStringList("warps");
+            player.sendMessage("§2§l--传送点列表--§r");
+            for (String warp : warps) {
+                player.sendMessage("§2§l"+warp+"§r");
+            }
+            return true;
+        }
         return false;
     }
 }
