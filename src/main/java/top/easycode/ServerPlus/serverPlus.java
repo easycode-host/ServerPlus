@@ -25,6 +25,7 @@ public final class serverPlus extends JavaPlugin implements Listener {
     public HashMap<UUID, Boolean> logged = new HashMap<UUID, Boolean>();
     public HashMap<UUID, UUID> TpaPlayers = new HashMap<UUID, UUID>();
     public HashMap<UUID, String> TpaState = new HashMap<UUID, String>();
+    public String DataPath = "./plugins/ServerPlus/";
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -51,12 +52,12 @@ public final class serverPlus extends JavaPlugin implements Listener {
         UUID uuid = player.getUniqueId();
         logged.put(uuid, false);
         player.sendMessage("§a§l欢迎来到"+getServer().getName()+"§r");
-        Files.createDirectories(Paths.get("plugins/ServerPlus/"+uuid));
+        Files.createDirectories(Paths.get(DataPath+uuid));
         try {
-            Files.createFile(Paths.get("plugins/ServerPlus/" + uuid + "/data.yml"));
-            Files.createFile(Paths.get("plugins/ServerPlus/" + uuid + "/config.yml"));
+            Files.createFile(Paths.get(DataPath + uuid + "/data.yml"));
+            Files.createFile(Paths.get(DataPath + uuid + "/config.yml"));
         }catch (FileAlreadyExistsException ignored){}
-        String password = YamlConfiguration.loadConfiguration(new File("plugins/ServerPlus/password.yml")).getString(String.valueOf(uuid));
+        String password = YamlConfiguration.loadConfiguration(new File(DataPath+"/password.yml")).getString(String.valueOf(uuid));
         if (password == null) {
             player.sendMessage("§2§l请注册：/register <密码> <确认密码>§r");
         }
@@ -79,9 +80,9 @@ public final class serverPlus extends JavaPlugin implements Listener {
                 player.sendMessage("§c§l两次输入的密码不一致§r");
                 return false;
             }
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(new File("plugins/ServerPlus/password.yml"));
+            YamlConfiguration config = YamlConfiguration.loadConfiguration(new File(DataPath+"/password.yml"));
             config.set(String.valueOf(player.getUniqueId()), args[0]);
-            try {config.save(new File("plugins/ServerPlus/password.yml"));}catch (IOException ignored){}
+            try {config.save(new File(DataPath+"/password.yml"));}catch (IOException ignored){}
             player.sendMessage("§2§l注册成功§r");
             logged.put(player.getUniqueId(), true);
             return true;
@@ -92,7 +93,7 @@ public final class serverPlus extends JavaPlugin implements Listener {
                 player.sendMessage("§2用法：/login <密码>§r");
                 return false;
             }
-            String password = YamlConfiguration.loadConfiguration(new File("plugins/ServerPlus/password.yml")).getString(String.valueOf(player.getUniqueId()));
+            String password = YamlConfiguration.loadConfiguration(new File(DataPath+"/password.yml")).getString(String.valueOf(player.getUniqueId()));
             if (password == null) {
                 player.sendMessage("§c§l请先注册§r");
                 return false;
@@ -175,6 +176,26 @@ public final class serverPlus extends JavaPlugin implements Listener {
             player.sendMessage("§c§l传送请求已拒绝§r");
             getServer().getPlayer(TpaPlayers.get(player.getUniqueId())).sendMessage("§c§l传送请求已被拒绝§r");
         }
+        if (command.getName().equalsIgnoreCase("setspawn")) {
+            player.setRespawnLocation(player.getLocation());
+            player.sendMessage("§2§l重生点已设置§r");
+        }
+        if (command.getName().equalsIgnoreCase("spawn")) {
+            if (player.getRespawnLocation() == null) return false;
+            player.teleport(player.getRespawnLocation());
+            player.sendMessage("§2§l传送至重生点成功§r");
+            return true;
+        }
+        if (command.getName().equalsIgnoreCase("sethome")) {
+            if (args.length != 0) {
+                player.sendMessage("§c§l命令格式错误§r");
+                player.sendMessage("§2用法：/sethome§r");
+            }
+            YamlConfiguration.loadConfiguration(new File("./plugins/ServerPlus"+player.getUniqueId()+"/data.yml")).set("home", player.getLocation());
+            player.sendMessage("§2§l家已设置§r");
+            return true;
+        }
+
         return false;
     }
 }

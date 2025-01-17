@@ -26,4 +26,32 @@ commands:
   tpdeny:
     description: "拒绝传送请求"
     usage: "/tpdeny"
+  setspawn:
+    description: "设置出生点"
+    usage: "/setspawn"
+  spawn:
+    description: "传送至出生点"
+    usage: "/spawn"
+  sethome:
+    description: "设置家"
+    usage: "/sethome"
+  home:
+    description: "传送至家"
+    usage: "/home"
+  delhome:
+    description: "删除家"
+    usage: "/delhome"
+  setwarp:
+    description: "设置传送点"
+    usage: "/setwarp <传送点名称>"
+  warp:
+    description: "传送至传送点"
+    usage: "/warp <传送点名称>"
+  delwarp:
+    description: "删除传送点"
+    usage: "/delwarp <传送点名称>"
+  warplist:
+    description: "查看传送点列表"
+    usage: "/warplist"
+
 
