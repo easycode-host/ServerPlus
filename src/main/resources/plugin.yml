@@ -1,0 +1,29 @@
+name: ServerPlus
+version: '1.0-SNAPSHOT'
+main: top.easycode.ServerPlus.serverPlus
+api-version: '1.21'
+prefix: [ ServerPlus ]
+load: STARTUP
+authors: [ easycode ]
+website: ServerPlus.easycode.top
+commands:
+  register:
+    description: "以<密码>注册"
+    usage: "/register <密码> <确认密码>"
+    aliases: [reg]
+  login:
+    description: "以<密码>登录"
+    usage: "/login <密码>"
+  tpa:
+    description: "传送至<玩家>处"
+    usage: "/tpa <玩家>"
+  tpahere:
+    description: "传送<玩家>至自己处"
+    usage: "/tpahere <玩家>"
+  tpaccept:
+    description: "接受传送请求"
+    usage: "/tpaccept"
+  tpdeny:
+    description: "拒绝传送请求"
+    usage: "/tpdeny"
+
